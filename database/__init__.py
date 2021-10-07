@@ -36,10 +36,18 @@ class UserTable(DatabaseModel):
     delte_flag = pw.BooleanField()
 
 
-class CategoryModel(DatabaseModel):
+class CategoryTable(DatabaseModel):
     class Meta:
-        db_table = "InterestsCategory"
+        db_table = "interests_category"
 
     id = pw.IntegerField()
-    cat_id = pw.CharField()
-    cat_info = pw.TextField()
+    category_name = pw.CharField()
+    category_info = pw.TextField()
+
+class UserCategoryTable(DatabaseModel):
+    class Meta:
+        db_table = "user_and_category"
+
+    id = pw.IntegerField()
+    category_name = pw.CharField()
+    category_info = pw.TextField()
