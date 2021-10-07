@@ -19,26 +19,21 @@ class UserTable(DatabaseModel):
     # PK
     id = pw.IntegerField()
     # Login Info
-    user_id = pw.CharField()
     password = pw.TextField()
     access_token = pw.TextField()
     token_valid_DT = pw.DateTimeField()
     # 개인정보
-    name = pw.CharField()
     email = pw.CharField()
+    name = pw.CharField()
     phone_num = pw.CharField()
-    sex = pw.CharField()
+    gender = pw.CharField()
     birthday = pw.DateField()
     #기타정보
     nickname = pw.CharField()
-    category1 = pw.CharField()
-    category2 = pw.CharField()
-    category3 = pw.CharField()
-    category4 = pw.CharField()
-    category5 = pw.CharField()
     # 탈퇴
-    deactivate_DT = pw.DateTimeField()
-    delete_DT = pw.DateTimeField()
+    delete_request_at = pw.DateTimeField()
+    delete_datetime = pw.DateTimeField()
+    delte_flag = pw.BooleanField()
 
 
 class CategoryModel(DatabaseModel):
