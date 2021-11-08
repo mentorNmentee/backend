@@ -17,8 +17,8 @@ class UserHelper:
                 return row_data
         return None
 
-    def email_check(self, email):
-        return UserTable.get_or_none(UserTable.email == email)
+    def get_user_by_token(self, token):
+        return UserTable.get_or_none(UserTable.access_token == token)
 
     def phone_num_check(self, phone_num):
         return UserTable.get_or_none(UserTable.phone_num == phone_num)
@@ -27,4 +27,12 @@ class UserHelper:
         return UserTable.get_or_none(UserTable.nickname == nickname)
 
     def create_user(self, data):
+        self.save_user_history(data)
         return UserTable.create(**data)
+
+    def update_user(self, data):
+        self.save_user_history(data)
+        return UserTable.update(**data).execute()
+
+    def save_user_history(self, data):
+        return UserHistoryTable.create(**data)

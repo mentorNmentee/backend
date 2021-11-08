@@ -21,7 +21,7 @@ class UserTable(DatabaseModel):
     # Login Info
     password = pw.TextField()
     access_token = pw.TextField()
-    token_valid_DT = pw.DateTimeField()
+    token_valid_datetime = pw.DateTimeField()
     # 개인정보
     email = pw.CharField()
     name = pw.CharField()
@@ -33,7 +33,30 @@ class UserTable(DatabaseModel):
     # 탈퇴
     delete_request_at = pw.DateTimeField()
     delete_datetime = pw.DateTimeField()
-    delte_flag = pw.BooleanField()
+    delete_flag = pw.BooleanField(default=False)
+
+class UserHistoryTable(DatabaseModel):
+    class Meta:
+        db_table = "user_history"
+
+    # PK
+    id = pw.IntegerField()
+    # Login Info
+    password = pw.TextField()
+    access_token = pw.TextField()
+    token_valid_datetime = pw.DateTimeField()
+    # 개인정보
+    email = pw.CharField()
+    name = pw.CharField()
+    phone_num = pw.CharField()
+    gender = pw.CharField()
+    birthday = pw.DateField()
+    #기타정보
+    nickname = pw.CharField()
+    # 탈퇴
+    delete_request_at = pw.DateTimeField()
+    delete_datetime = pw.DateTimeField()
+    delete_flag = pw.BooleanField()
 
 
 class CategoryTable(DatabaseModel):
@@ -49,5 +72,5 @@ class UserCategoryTable(DatabaseModel):
         db_table = "user_and_category"
 
     id = pw.IntegerField()
-    category_name = pw.CharField()
-    category_info = pw.TextField()
+    user_id = pw.CharField()
+    category_id = pw.TextField()
