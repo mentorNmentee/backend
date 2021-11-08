@@ -14,12 +14,8 @@ class UserManager:
         return bcrypt.checkpw(password.encode(), row_data.password.encode())
 
     def deactivate_check(self, row_data):
-        if row_data.deactivate_DT is not None:
-            if row_data.delete_DT < datetime.datetime.utcnow():
-                row_data.delete()
-                return True
-            else:
-                return True
+        if row_data.token_valid_datetime is None or row_data.token_valid_datetime <= datetime.datetime.utcnow():
+            return True
         else:
             return False
 
@@ -28,17 +24,21 @@ class UserManager:
         return bcrypt.hashpw(password.encode(), salt)
 
     def token_create(self, row_data):
-        row_data.access_token = jwt.encode({"user_id": row_data.user_id}, "mentorNmenteeBackend", algorithm="HS256")
-        row_data.token_valid_DT = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-        return row_data.save()
+        new_token = jwt.encode({"email": row_data.email}, "mentorNmenteeBackend", algorithm="HS256")
+        next_day = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+        data = {"token_valid_datetime": next_day, "access_token": new_token}
+
+        if self.user_helper.update_user(data):
+            result = row_data.__dict__['__data__']
+            result['token_valid_datetime'] = next_day
+            result['access_token'] = new_token
+            return result
+        else:
+            return None
 
     def sign_up(self, data):
-        temp = self.user_helper.user_id_check(data.user_id)
+        temp = self.user_helper.get_user_by_email(data.email)
         if temp:
-            if self.deactivate_check(temp):
-                return 400, {"message": "This is Deactivate Account ID"}
-            return 400, {"message": "ID already in use"}
-        elif self.user_helper.email_check(data.email):
             return 400, {"message": "Email already in use"}
         elif self.user_helper.phone_num_check(data.phone_num):
             return 400, {"message": "Phone Num already in use"}
@@ -49,24 +49,27 @@ class UserManager:
             return 201, {"message": "SignUp Success"}
 
     def login(self, data):
-        row_data = self.user_helper.user_id_check(data.user_id)
+        row_data = self.user_helper.get_user_by_email(data.email)
+
         if row_data is not None:
             if self.password_check(data.password, row_data):
                 if self.deactivate_check(row_data):
-                    return 400, {"message": "Deactivate Account"}
+                    if self.token_create(row_data):
+                        return 200, row_data
+                    else:
+                        raise ex.NotFoundUserEx
                 else:
-                    self.token_create(row_data)
-                    return 200, {"token": row_data.access_token}
+                    return 200, row_data.__dict__['__data__']
             else:
-                return 400, {"message": "Please Check Password"}
+                raise ex.NotFoundUserEx
         else:
-            return 400, {"message": "Please Check ID"}
+            raise ex.NotFoundUserEx
 
     def logout(self, access_token):
         row_data = self.user_helper.token_check(access_token)
         if row_data is not None:
             row_data.access_token = None
-            row_data.token_valid_DT = None
+            row_data.token_valid_datetime = None
             row_data.save()
             return 200, {"message": "Logout Success"}
         else:

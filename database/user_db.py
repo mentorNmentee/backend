@@ -7,8 +7,8 @@ class UserHelper:
     def __init__(self):
         pass
 
-    def user_id_check(self, user_id):
-        return UserTable.get_or_none(UserTable.user_id == user_id)
+    def get_user_by_email(self, email):
+        return UserTable.get_or_none(UserTable.email == email)
 
     def token_check(self, access_token):
         row_data = UserTable.get_or_none(UserTable.access_token == access_token)
