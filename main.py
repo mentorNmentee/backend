@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from config import ServerInfo
 from router import router
 
-app = FastAPI(docs_url='/mNm-docs/', redoc_url='/mNm-redoc/')
+ServerInfo = ServerInfo()
+app = FastAPI(docs_url='/community-docs/', redoc_url='/community-redoc/')
 app.include_router(router.router)
 
 if __name__ == '__main__':
